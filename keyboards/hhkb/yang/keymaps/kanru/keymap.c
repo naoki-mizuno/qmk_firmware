@@ -30,7 +30,7 @@ enum custom_layers {
 
 enum my_keycodes { KC_VBAT = SAFE_RANGE };
 
-uint32_t adafruit_ble_read_battery_voltage(void);
+uint32_t bluefruit_le_read_battery_voltage(void);
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
@@ -38,7 +38,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_VBAT:
             if (record->event.pressed) {
                 char    vbat[8];
-                uint8_t level = (adafruit_ble_read_battery_voltage() - BATTERY_EMPTY) / (float)(BATTERY_FULL - BATTERY_EMPTY) * 100;
+                uint8_t level = (bluefruit_le_read_battery_voltage() - BATTERY_EMPTY) / (float)(BATTERY_FULL - BATTERY_EMPTY) * 100;
                 snprintf(vbat, sizeof(vbat), "%d", level);
                 send_string(vbat);
             }

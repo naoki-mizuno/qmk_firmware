@@ -884,7 +884,7 @@ ifeq ($(strip $(USBPD_ENABLE)), yes)
 endif
 
 BLUETOOTH_ENABLE ?= no
-VALID_BLUETOOTH_DRIVER_TYPES := BluefruitLE RN42 custom
+VALID_BLUETOOTH_DRIVER_TYPES := BluefruitLE BluefruitLE_UART RN42 custom
 ifeq ($(strip $(BLUETOOTH_ENABLE)), yes)
     ifeq ($(filter $(strip $(BLUETOOTH_DRIVER)),$(VALID_BLUETOOTH_DRIVER_TYPES)),)
         $(call CATASTROPHIC_ERROR,Invalid BLUETOOTH_DRIVER,BLUETOOTH_DRIVER="$(BLUETOOTH_DRIVER)" is not a valid Bluetooth driver type)
@@ -899,6 +899,11 @@ ifeq ($(strip $(BLUETOOTH_ENABLE)), yes)
         SRC += $(DRIVER_PATH)/bluetooth/bluefruit_le.cpp
         QUANTUM_LIB_SRC += analog.c
         QUANTUM_LIB_SRC += spi_master.c
+    endif
+
+    ifeq ($(strip $(BLUETOOTH_DRIVER)), BluefruitLE_UART)
+        OPT_DEFS += -DBLUETOOTH_BLUEFRUIT_LE_UART -DHAL_USE_SERIAL=TRUE
+        SRC += $(DRIVER_PATH)/bluetooth/bluefruit_le_uart.c
     endif
 
     ifeq ($(strip $(BLUETOOTH_DRIVER)), RN42)

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "quantum.h"
 
 #ifdef BLUETOOTH_ENABLE
-#    include "adafruit_ble.h"
+#    include "bluefruit_le.h"
 #endif
 
 #define RELAX_TIME_US 5
@@ -136,7 +136,7 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     } else if (time_diff > MATRIX_POWER_SAVE_TIMEOUT_L2_MS) {
         power_save_level = 2;
 #ifdef BLUETOOTH_ENABLE
-        if (!adafruit_ble_is_connected()) {
+        if (!bluefruit_le_is_connected()) {
             power_save_level = 3;
         }
 #endif
@@ -154,17 +154,17 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     return matrix_has_changed;
 }
 
-bool adafruit_ble_delbonds(void);
-bool adafruit_ble_reconnect(void);
+bool bluefruit_le_delbonds(void);
+bool bluefruit_le_reconnect(void);
 
 bool command_extra(uint8_t code) {
     switch (code) {
 #ifdef BLUETOOTH_ENABLE
         case KC_R:
-            adafruit_ble_delbonds();
+            bluefruit_le_delbonds();
             return true;
         case KC_S:
-            adafruit_ble_reconnect();
+            bluefruit_le_reconnect();
             return true;
 #endif
         default:

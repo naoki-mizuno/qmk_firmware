@@ -11,9 +11,10 @@ CONSOLE_ENABLE = no         # Console for debug
 COMMAND_ENABLE = yes        # Commands for debug and configuration
 NKRO_ENABLE = no            # USB Nkey Rollover
 
-# Disable bluetooth until the UART code is merged
-BLUETOOTH_DRIVER = BluefruitLE
+BLUETOOTH_ENABLE = yes
+BLUETOOTH_DRIVER = BluefruitLE_UART
 
 # Custom matrix file for the HHKB
 CUSTOM_MATRIX = lite
+SRC += serial_uart.c
 SRC += matrix.c
