@@ -12,7 +12,7 @@
     "caps_lock": "F4"
   },
   "bluetooth": {
-    "driver": "bluefruit_le"
+    "driver": "bluefruit_le_uart"
   },
   "processor": "atmega32u4",
   "bootloader": "lufa-ms",

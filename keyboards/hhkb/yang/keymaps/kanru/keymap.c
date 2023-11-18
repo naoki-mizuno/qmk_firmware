@@ -18,6 +18,9 @@
  */
 #include QMK_KEYBOARD_H
 #include <stdio.h>
+#ifdef BLUETOOTH_ENABLE
+#include "bluefruit_le.h"
+#endif
 
 enum custom_layers {
     BASE,
@@ -30,15 +33,13 @@ enum custom_layers {
 
 enum my_keycodes { KC_VBAT = SAFE_RANGE };
 
-uint32_t adafruit_ble_read_battery_voltage(void);
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
 #ifdef BLUETOOTH_ENABLE
         case KC_VBAT:
             if (record->event.pressed) {
                 char    vbat[8];
-                uint8_t level = (adafruit_ble_read_battery_voltage() - BATTERY_EMPTY) / (float)(BATTERY_FULL - BATTERY_EMPTY) * 100;
+                uint8_t level = (bluefruit_le_read_battery_voltage() - BATTERY_EMPTY) / (float)(BATTERY_FULL - BATTERY_EMPTY) * 100;
                 snprintf(vbat, sizeof(vbat), "%d", level);
                 send_string(vbat);
             }
