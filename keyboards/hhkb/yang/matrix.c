@@ -135,7 +135,9 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
 
     // Power saving
     uint32_t time_diff = timer_elapsed32(matrix_last_modified);
-    if (time_diff > MATRIX_POWER_SAVE_TIMEOUT_L3_MS) {
+    if (power_save_level > 3) {
+        suspend_power_down_longer();
+    } else if (time_diff > MATRIX_POWER_SAVE_TIMEOUT_L3_MS) {
         power_save_level = 3;
         suspend_power_down_longer();
     } else if (time_diff > MATRIX_POWER_SAVE_TIMEOUT_L2_MS) {
