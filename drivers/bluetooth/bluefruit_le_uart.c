@@ -357,10 +357,8 @@ uint32_t bluefruit_le_read_battery_voltage(void) {
     if (!state.configured) {
         return 0;
     }
-    if (at_command_P(PSTR("AT+HWADC=6"), resbuf, sizeof(resbuf))) {
-        return atoi(resbuf);
-    }
-    return 0;
+    at_command_P(PSTR("AT+HWADC=6"), resbuf, sizeof(resbuf));
+    return atoi(resbuf);
 }
 
 bool bluefruit_le_set_battery_level(uint8_t level) {
