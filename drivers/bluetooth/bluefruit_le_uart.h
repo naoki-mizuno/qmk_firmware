@@ -27,6 +27,7 @@ extern "C" {
 
 extern bool bluefruit_le_delbonds(void);
 extern bool bluefruit_le_reconnect(void);
+extern bool bluefruit_le_factory_reset(void);
 
 #ifdef __cplusplus
 }

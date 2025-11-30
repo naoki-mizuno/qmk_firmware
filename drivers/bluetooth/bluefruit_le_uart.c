@@ -25,6 +25,7 @@
 #include "debug.h"
 #include "timer.h"
 #include "progmem.h"
+#include "wait.h"
 
 #define TIMEOUT 100
 #define SAMPLE_BATTERY
@@ -39,6 +40,7 @@
 
 #ifdef SAMPLE_BATTERY
 bool bluefruit_le_set_battery_level(uint8_t level);
+uint32_t bluefruit_le_read_battery_voltage(void);
 #endif
 
 static struct {
@@ -386,4 +388,55 @@ bool bluefruit_le_reconnect(void) {
         return false;
     }
     return at_command_P(PSTR("AT+GAPSTARTADV"), NULL, 0);
+}
+
+bool bluefruit_le_factory_reset(void) {
+    // Ensure module is initialized before sending commands
+    if (!state.initialized) {
+        bluefruit_le_init();
+        if (!state.initialized) {
+            return false;
+        }
+    }
+
+    char resbuf[32];
+
+    // Try to query current baud rate at 76800
+    if (!at_command_P(PSTR("AT+BAUDRATE"), resbuf, sizeof(resbuf))) {
+        // Failed at 76800, module might be at 9600 from previous reset
+        // Switch to 9600 and try again
+        uart_init(9600);
+        at_command_P(PSTR("AT+BAUDRATE"), resbuf, sizeof(resbuf));
+    }
+
+    // Now factory reset the Bluetooth module to clear all stored settings
+    // NOTE: The module might reset before sending OK, so we don't check return value
+    at_command_P(PSTR("AT+FACTORYRESET"), NULL, 0);
+
+    // Important: Wait for factory reset to complete (module reboots)
+    wait_ms(500);
+
+    // Detect what baud rate the module is at after factory reset
+    // Try 9600 first (factory default)
+    uart_init(9600);
+    if (!at_command_P(PSTR("AT+BAUDRATE"), resbuf, sizeof(resbuf))) {
+        // Not at 76800, try 9600
+        uart_init(NRF51_BAUD_RATE);
+        at_command_P(PSTR("AT+BAUDRATE"), resbuf, sizeof(resbuf));
+    }
+
+    // Set baud rate to 76800 (works at either current rate)
+    at_command_P(PSTR("AT+BAUDRATE=" STR(NRF51_BAUD_RATE)), resbuf, sizeof(resbuf));
+
+    // Reset to apply the baud rate change
+    //at_command_P(PSTR("ATZ"), NULL, 0);
+
+    // Now switch back to 76800 baud
+    uart_init(NRF51_BAUD_RATE);
+
+    // Mark as needing full reconfiguration
+    state.configured = false;
+    state.initialized = true;
+
+    return true;
 }

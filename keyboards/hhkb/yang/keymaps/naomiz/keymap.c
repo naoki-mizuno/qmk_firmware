@@ -20,7 +20,18 @@
 #include <stdio.h>
 #ifdef BLUETOOTH_ENABLE
 #include "bluefruit_le.h"
+#include "bluefruit_le_uart.h"
+// Forward declaration for battery reading function from bluefruit_le_uart.c
+extern uint32_t bluefruit_le_read_battery_voltage(void);
 #endif
+#include "gpio.h"
+#include "wait.h"
+
+// LED pins
+#define LED_0_PIN F4
+#define LED_2_PIN F1
+// Green LED under the right USB port
+#define LED_4_PIN F0
 
 enum custom_layers {
     BASE,
@@ -38,6 +49,7 @@ enum my_keycodes {
     KC_VBAT = SAFE_RANGE,
     KC_LOCK,
     KC_UNLOCK,
+    KC_BTRS,
 };
 
 const uint16_t PROGMEM unlock_combo[] = {KC_U, KC_H, COMBO_END};
@@ -45,13 +57,35 @@ combo_t key_combos[COMBO_COUNT] = {
     COMBO(unlock_combo, KC_UNLOCK),
 };
 
+#ifdef BLUETOOTH_ENABLE
+// Helper function to read battery percentage from Bluetooth module
+static uint8_t read_battery_percent_from_bluetooth(void) {
+    // Read raw ADC value from VBAT via AT+HWADC=6 command to nRF51822
+    uint32_t raw = bluefruit_le_read_battery_voltage();
+
+    if (raw == 0) {
+        return 0; // Failed to read or not connected
+    }
+
+    // Map raw ADC value to percentage
+    if (raw >= BATTERY_FULL) {
+        return 100;
+    } else if (raw <= BATTERY_EMPTY) {
+        return 0;
+    }
+
+    // Linear interpolation between empty and full
+    return ((raw - BATTERY_EMPTY) * 100) / (BATTERY_FULL - BATTERY_EMPTY);
+}
+#endif
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
 #ifdef BLUETOOTH_ENABLE
         case KC_VBAT:
             if (record->event.pressed) {
                 char    vbat[8];
-                uint8_t level = ((float)(bluefruit_le_read_battery_voltage()) - BATTERY_EMPTY) / (BATTERY_FULL - BATTERY_EMPTY) * 100;
+                uint8_t level = read_battery_percent_from_bluetooth();
                 snprintf(vbat, sizeof(vbat), "%d", level);
                 send_string(vbat);
             }
@@ -66,6 +100,23 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 power_save_level = 0;
                 suspend_wakeup_init();
+            }
+            return false;
+        case KC_BTRS:
+            if (record->event.pressed) {
+                // Green LED solid on during operation
+                gpio_set_pin_output(LED_4_PIN);
+                gpio_write_pin_high(LED_4_PIN);
+
+                // Factory reset (handles baud rate setting internally)
+                bluefruit_le_factory_reset();
+
+                wait_ms(1000);
+
+                // Enable keyboard (sets device name, etc.)
+                bluefruit_le_enable_keyboard();
+
+                gpio_write_pin_low(LED_4_PIN);
             }
             return false;
 #endif
@@ -149,7 +200,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      |--------+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+--------+
      |          | Lft | Dwn | Rht | WhU | Pl1 | Pl2 |     |     |     | Lft | Rht |            |
      |----------+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+------+-----+
-     |            | WhL | Bt3 | WhR | WhD | RST |     |     |     |     | Dwn |          |     |
+     |            | WhL | Bt3 | WhR | WhD |     | BTR |     |     |     | Dwn |          |     |
      +--------+---+-+---+-----++----+-----+-----+-----+-----+----++-----+---+-+----+-----+-----+
               |     |          |              Lock               |          |      |
               +-----+----------+---------------------------------+----------+------+
@@ -158,9 +209,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [MOUSE] = LAYOUT_60_hhkb(
             KC_TRNS, KC_F1  , KC_F2  , KC_F3  , KC_F4  , KC_F5  , KC_F6  , KC_F7  , KC_F8  , KC_F9  , KC_F10 , KC_F11 , KC_F12 , KC_TRNS, KC_DEL,
-            KC_TRNS, KC_BTN1, KC_MS_U, KC_BTN2, KC_TRNS, DM_REC1, DM_REC2, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_UP  , KC_TRNS, KC_TRNS,
-            KC_TRNS, KC_MS_L, KC_MS_D, KC_MS_R, KC_WH_U, DM_PLY1, DM_PLY2, KC_TRNS, KC_TRNS, KC_TRNS, KC_LEFT, KC_RGHT, KC_TRNS,
-            KC_TRNS, KC_WH_L, KC_BTN3, KC_WH_R, KC_WH_D, DM_RSTP, DM_RSTP, KC_TRNS, KC_TRNS, KC_TRNS, KC_DOWN, KC_TRNS, KC_TRNS,
+            KC_TRNS, MS_BTN1, MS_UP  , MS_BTN2, KC_TRNS, DM_REC1, DM_REC2, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_UP  , KC_TRNS, KC_TRNS,
+            KC_TRNS, MS_LEFT, MS_DOWN, MS_RGHT, MS_WHLU, DM_PLY1, DM_PLY2, KC_TRNS, KC_TRNS, KC_TRNS, KC_LEFT, KC_RGHT, KC_TRNS,
+            KC_TRNS, MS_WHLL, MS_BTN3, MS_WHLR, MS_WHLD, KC_TRNS, KC_BTRS, KC_TRNS, KC_TRNS, KC_TRNS, KC_DOWN, KC_TRNS, KC_TRNS,
             KC_TRNS, KC_TRNS, KC_LOCK, KC_TRNS, KC_TRNS
     ),
 };
