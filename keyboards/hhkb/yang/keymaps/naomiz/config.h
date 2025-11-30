@@ -17,9 +17,6 @@
 
 #define MOUSEKEY_DELAY 0
 
-#undef PRODUCT
-#define PRODUCT "HHKB Professional 2"
-
 #define LAPO_KEYS KC_LALT, KC_LSFT, KC_LEFT_BRACKET
 #define RAPC_KEYS KC_RALT, KC_LSFT, KC_RIGHT_BRACKET
 
