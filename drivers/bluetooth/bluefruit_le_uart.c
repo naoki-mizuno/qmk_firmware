@@ -453,9 +453,6 @@ bool bluefruit_le_factory_reset(void) {
     // Set baud rate to 76800 (works at either current rate)
     at_command_P(PSTR("AT+BAUDRATE=" STR(NRF51_BAUD_RATE)), resbuf, sizeof(resbuf));
 
-    // Reset to apply the baud rate change
-    //at_command_P(PSTR("ATZ"), NULL, 0);
-
     // Now switch back to 76800 baud
     uart_init(NRF51_BAUD_RATE);
 
