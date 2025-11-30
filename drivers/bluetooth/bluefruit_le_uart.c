@@ -274,13 +274,6 @@ void bluefruit_le_task(void) {
             set_connected(atoi(resbuf));
         }
     }
-
-    if (timer_elapsed(state.last_battery_update) > BatteryLevelUpdateInterval) {
-        state.last_battery_update = timer_read();
-
-        uint8_t level = (bluefruit_le_read_battery_voltage() - BATTERY_EMPTY) / (float)(BATTERY_FULL - BATTERY_EMPTY) * 100;
-        bluefruit_le_set_battery_level(level);
-    }
 }
 
 static bool process_queue_item(struct queue_item *item) {
