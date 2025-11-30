@@ -26,6 +26,7 @@ extern "C" {
 #endif
 
 extern bool bluefruit_le_delbonds(void);
+extern bool bluefruit_le_disconnect(void);
 extern bool bluefruit_le_reconnect(void);
 extern bool bluefruit_le_factory_reset(void);
 

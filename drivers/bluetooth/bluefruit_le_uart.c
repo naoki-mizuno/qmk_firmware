@@ -398,6 +398,13 @@ bool bluefruit_le_delbonds(void) {
     return at_command_P(PSTR("AT+GAPDELBONDS"), NULL, 0);
 }
 
+bool bluefruit_le_disconnect(void) {
+    if (!state.configured) {
+        return false;
+    }
+    return at_command_P(PSTR("AT+GAPDISCONNECT"), NULL, 0);
+}
+
 bool bluefruit_le_reconnect(void) {
     if (!state.configured) {
         return false;

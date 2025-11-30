@@ -108,6 +108,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 gpio_set_pin_output(LED_4_PIN);
                 gpio_write_pin_high(LED_4_PIN);
 
+#if 0
                 // Factory reset (handles baud rate setting internally)
                 bluefruit_le_factory_reset();
 
@@ -115,7 +116,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
                 // Enable keyboard (sets device name, etc.)
                 bluefruit_le_enable_keyboard();
-
+#else
+                // Disconnect current connection, then delete all bonds
+                // This allows re-pairing without factory reset
+                bluefruit_le_delbonds();
+                wait_ms(200);
+                bluefruit_le_disconnect();
+                wait_ms(300);
+#endif
                 gpio_write_pin_low(LED_4_PIN);
             }
             return false;
