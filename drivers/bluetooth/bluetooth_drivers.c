@@ -17,14 +17,14 @@
 
 #include "bluetooth.h"
 
-#if defined(BLUETOOTH_BLUEFRUIT_LE)
+#if defined(BLUETOOTH_BLUEFRUIT_LE) || defined(BLUETOOTH_BLUEFRUIT_LE_UART)
 #    include "bluefruit_le.h"
 #elif defined(BLUETOOTH_RN42)
 #    include "rn42.h"
 #endif
 
 void bluetooth_init(void) {
-#if defined(BLUETOOTH_BLUEFRUIT_LE)
+#if defined(BLUETOOTH_BLUEFRUIT_LE) || defined(BLUETOOTH_BLUEFRUIT_LE_UART)
     bluefruit_le_init();
 #elif defined(BLUETOOTH_RN42)
     rn42_init();
@@ -32,13 +32,13 @@ void bluetooth_init(void) {
 }
 
 void bluetooth_task(void) {
-#if defined(BLUETOOTH_BLUEFRUIT_LE)
+#if defined(BLUETOOTH_BLUEFRUIT_LE) || defined(BLUETOOTH_BLUEFRUIT_LE_UART)
     bluefruit_le_task();
 #endif
 }
 
 bool bluetooth_is_connected(void) {
-#if defined(BLUETOOTH_BLUEFRUIT_LE)
+#if defined(BLUETOOTH_BLUEFRUIT_LE) || defined(BLUETOOTH_BLUEFRUIT_LE_UART)
     return bluefruit_le_is_connected();
 #else
     // TODO: drivers should check if BT is connected here
@@ -47,7 +47,7 @@ bool bluetooth_is_connected(void) {
 }
 
 void bluetooth_send_keyboard(report_keyboard_t *report) {
-#if defined(BLUETOOTH_BLUEFRUIT_LE)
+#if defined(BLUETOOTH_BLUEFRUIT_LE) || defined(BLUETOOTH_BLUEFRUIT_LE_UART)
     bluefruit_le_send_keyboard(report);
 #elif defined(BLUETOOTH_RN42)
     rn42_send_keyboard(report);
@@ -55,7 +55,7 @@ void bluetooth_send_keyboard(report_keyboard_t *report) {
 }
 
 void bluetooth_send_mouse(report_mouse_t *report) {
-#if defined(BLUETOOTH_BLUEFRUIT_LE)
+#if defined(BLUETOOTH_BLUEFRUIT_LE) || defined(BLUETOOTH_BLUEFRUIT_LE_UART)
     bluefruit_le_send_mouse(report);
 #elif defined(BLUETOOTH_RN42)
     rn42_send_mouse(report);
@@ -63,7 +63,7 @@ void bluetooth_send_mouse(report_mouse_t *report) {
 }
 
 void bluetooth_send_consumer(uint16_t usage) {
-#if defined(BLUETOOTH_BLUEFRUIT_LE)
+#if defined(BLUETOOTH_BLUEFRUIT_LE) || defined(BLUETOOTH_BLUEFRUIT_LE_UART)
     bluefruit_le_send_consumer(usage);
 #elif defined(BLUETOOTH_RN42)
     rn42_send_consumer(usage);
