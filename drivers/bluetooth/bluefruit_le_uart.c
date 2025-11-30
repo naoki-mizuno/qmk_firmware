@@ -170,7 +170,7 @@ static bool at_command(const char *cmd, size_t len, char *resp, uint16_t resplen
     }
 
     uart_gets(ok, sizeof(ok), TIMEOUT);
-    return (memcmp_P(resp, PSTR("OK"), 2) == 0);
+    return (memcmp_P(ok, PSTR("OK"), 2) == 0);
 }
 
 static bool at_command_P(const char *cmd, char *resp, uint16_t resplen) {
