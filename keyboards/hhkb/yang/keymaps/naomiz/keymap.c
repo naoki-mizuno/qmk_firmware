@@ -108,7 +108,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      |----------+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+-+---+------+-----+
      | L_Shift    |  Z  |  X  |  C  |  V  |  B  |  N  |  M  |  ,  |  .  |  /  |  R_Shift | Ly0 |
      +--------+---+-+---+-----++----+-----+-----+-----+-----+----++-----+---+-+----+-----+-----+
-              | Ly1 |   LAlt   |              Space              |   RAlt   | RGUI |
+              | Ly1 |   LAPO   |              Space              |   RAPC   | RGUI |
               +-----+----------+---------------------------------+----------+------+
     */
     [QWERTY] = LAYOUT_60_hhkb(
@@ -116,7 +116,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
             KC_TAB , KC_Q   , KC_W  , KC_E   , KC_R   , KC_T, KC_Y, KC_U, KC_I   , KC_O  , KC_P   , KC_LBRC, KC_RBRC, KC_BSPC,
             KC_LCTL, KC_A   , KC_S  , KC_D   , KC_F   , KC_G, KC_H, KC_J, KC_K   , KC_L  , KC_SCLN, KC_QUOT, KC_ENT ,
             KC_LSFT, KC_Z   , KC_X  , KC_C   , KC_V   , KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_RSFT, DF(0)  ,
-            MO(2)  , KC_LALT, KC_SPC, KC_RALT, KC_RGUI
+            MO(2)  , SC_LAPO, KC_SPC, SC_RAPC, KC_RGUI
     ),
 
     /* Layer HHKB: HHKB mode (HHKB Fn)
