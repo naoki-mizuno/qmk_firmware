@@ -56,9 +56,13 @@ void hhkb_led_off(uint8_t led) {
 }
 
 void keyboard_pre_init_kb(void) {
-    // BT power up
+    // BT power control
     gpio_set_pin_output(D5);
-    gpio_write_pin_low(D5);
+#ifdef BLUETOOTH_ENABLE
+    gpio_write_pin_low(D5);  // Power on BLE module
+#else
+    gpio_write_pin_high(D5); // Power off BLE module (not used)
+#endif
 
     // Row selectors
     gpio_set_pin_output(B0);
