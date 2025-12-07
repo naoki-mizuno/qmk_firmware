@@ -98,8 +98,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case KC_UNLOCK:
             if (record->event.pressed) {
+                gpio_set_pin_output(LED_4_PIN);
+                gpio_write_pin_high(LED_4_PIN);
                 power_save_level = 0;
                 suspend_wakeup_init();
+                wait_ms(500);
+                gpio_write_pin_low(LED_4_PIN);
             }
             return false;
         case KC_BTRS:
