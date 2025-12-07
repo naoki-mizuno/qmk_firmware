@@ -405,14 +405,19 @@ bool bluefruit_le_disconnect(void) {
     return at_command_P(PSTR("AT+GAPDISCONNECT"), NULL, 0);
 }
 
+bool bluefruit_le_start_advertising(void) {
+    // Start advertising without checking state
+    // Used after power-up when module has restored config from flash
+    return at_command_P(PSTR("AT+GAPSTARTADV"), NULL, 0);
+}
+
 bool bluefruit_le_reconnect(void) {
     if (!state.configured) {
         return false;
     }
-    if (!at_command_P(PSTR("AT+GAPDISCONNECT"), NULL, 0)) {
-        return false;
-    }
-    return at_command_P(PSTR("AT+GAPSTARTADV"), NULL, 0);
+    at_command_P(PSTR("AT+GAPDISCONNECT"), NULL, 0);
+    wait_ms(500);
+    return bluefruit_le_start_advertising();
 }
 
 bool bluefruit_le_factory_reset(void) {
