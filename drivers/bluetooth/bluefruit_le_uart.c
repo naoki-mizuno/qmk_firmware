@@ -26,6 +26,8 @@
 #include "timer.h"
 #include "progmem.h"
 #include "wait.h"
+// Used for LED blinking debug
+//#include "gpio.h"
 
 #define TIMEOUT 100
 #define SAMPLE_BATTERY
@@ -264,6 +266,22 @@ void bluefruit_le_task(void) {
     if (state.powered_down) {
         return;
     }
+
+    // DEBUG: Toggle LED (F0/LED_4) to show task is running
+    // At Lv 0, LED looks continuous on (since refresh rate is fast)
+    // At Lv 1, LED looks rapidly blinking
+    // At Lv 2, LED blinks every second
+    // At Lv 3, LED is off
+    /*
+    static bool debug_led_state = false;
+    debug_led_state = !debug_led_state;
+    DDRF |= (1 << 0);  // Set F0 as output
+    if (debug_led_state) {
+        PORTF |= (1 << 0);  // LED on
+    } else {
+        PORTF &= ~(1 << 0); // LED off
+    }
+    */
 
     if (!state.configured && !bluefruit_le_enable_keyboard()) {
         return;
