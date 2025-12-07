@@ -30,6 +30,7 @@ extern bool bluefruit_le_disconnect(void);
 extern bool bluefruit_le_start_advertising(void);
 extern bool bluefruit_le_reconnect(void);
 extern bool bluefruit_le_factory_reset(void);
+extern void bluefruit_le_set_powered_down(bool powered_down);
 
 #ifdef __cplusplus
 }

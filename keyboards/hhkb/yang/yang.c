@@ -16,7 +16,16 @@
 
 #include "quantum.h"
 
+#ifdef BLUETOOTH_ENABLE
+#    include "bluefruit_le.h"
+#    include "bluefruit_le_uart.h"
+#endif
+
 extern uint8_t power_save_level;
+
+#ifdef BLUETOOTH_ENABLE
+static bool ble_powered_down = false;
+#endif
 
 void hhkb_led_on(uint8_t led) {
     switch (led) {
@@ -89,21 +98,44 @@ void keyboard_pre_init_kb(void) {
 }
 
 void suspend_power_down_kb(void) {
-    if (power_save_level > 2) {
+#ifdef BLUETOOTH_ENABLE
+    // Only power down ONCE when entering Level 3, not every scan cycle!
+    if (power_save_level > 2 && !ble_powered_down) {
+        ble_powered_down = true;
+
+        // Gracefully disconnect from PC
+        bluefruit_le_disconnect();
+
         // Disable UART TX to avoid current leakage
         UCSR1B &= ~_BV(TXEN1);
         // Power down BLE module
         gpio_write_pin_high(D5);
+
+        // Tell driver the module is powered down so it doesn't try to use it
+        bluefruit_le_set_powered_down(true);
     }
+#endif
 
     suspend_power_down_user();
 }
 
 void suspend_wakeup_init_kb(void) {
-    // Power up BLE module
-    gpio_write_pin_low(D5);
-    // Enable UART TX
-    UCSR1B |= _BV(TXEN1);
+#ifdef BLUETOOTH_ENABLE
+    if (ble_powered_down) {
+        ble_powered_down = false;
+
+        // Reset power_save_level to prevent re-entering suspend
+        power_save_level = 0;
+
+        // Power up BLE module
+        gpio_write_pin_low(D5);
+        // Enable UART TX
+        UCSR1B |= _BV(TXEN1);
+
+        // Tell driver the module is powered up
+        bluefruit_le_set_powered_down(false);
+    }
+#endif
 
     suspend_wakeup_init_user();
 }

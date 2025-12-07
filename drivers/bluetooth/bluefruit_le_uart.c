@@ -47,6 +47,7 @@ static struct {
     bool is_connected;
     bool initialized;
     bool configured;
+    bool powered_down;  // Module is powered off, don't try to use it
 
 #ifdef SAMPLE_BATTERY
     uint16_t last_battery_update;
@@ -124,6 +125,7 @@ void bluefruit_le_init(void) {
     state.initialized  = false;
     state.configured   = false;
     state.is_connected = false;
+    state.powered_down = false;
     send_queue.head    = 0;
     send_queue.tail    = 0;
 
@@ -257,6 +259,11 @@ static void set_connected(bool connected) {
 void bluefruit_le_task(void) {
     char              resbuf[48];
     struct queue_item item;
+
+    // If module is powered down, don't try to use it
+    if (state.powered_down) {
+        return;
+    }
 
     if (!state.configured && !bluefruit_le_enable_keyboard()) {
         return;
@@ -466,4 +473,8 @@ bool bluefruit_le_factory_reset(void) {
     state.initialized = true;
 
     return true;
+}
+
+void bluefruit_le_set_powered_down(bool powered_down) {
+    state.powered_down = powered_down;
 }
