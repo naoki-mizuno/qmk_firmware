@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* matrix power saving */
 #define MATRIX_POWER_SAVE_TIMEOUT_MS 10000
 #define MATRIX_POWER_SAVE_TIMEOUT_L2_MS 1800000
-#define MATRIX_POWER_SAVE_TIMEOUT_L3_MS 7200000
+#define MATRIX_POWER_SAVE_TIMEOUT_L3_MS 3600000
 
 /*
  * Feature disable options
