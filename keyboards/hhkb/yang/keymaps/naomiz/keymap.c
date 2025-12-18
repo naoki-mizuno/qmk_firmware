@@ -41,7 +41,7 @@ enum custom_layers {
 };
 
 #define BATTERY_FULL 556
-#define BATTERY_EMPTY 326
+#define BATTERY_EMPTY 395
 
 extern uint8_t power_save_level;
 
